@@ -3,11 +3,12 @@ import '../models/product.dart';
 import '../state/products_container.dart';
 
 /// Экран добавления/редактирования товара.
-/// Вариант B: если экран открыт как ВКЛАДКА в HomeScreen,
-/// по завершении сохранения вызывает [onSavedInTab] для переключения вкладки.
+/// Поддерживает два сценария:
+/// 1) Открыт через Navigator.push(...) — стрелка "Назад" делает Navigator.pop(context).
+/// 2) Открыт как вкладка HomeScreen — по сохранению дергается onSavedInTab.
 class ProductFormScreen extends StatefulWidget {
   final Product? editing;
-  final VoidCallback? onSavedInTab; // ✅ колбэк для варианта B
+  final VoidCallback? onSavedInTab; // когда форма открыта как вкладка
 
   const ProductFormScreen({
     super.key,
@@ -30,7 +31,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   final _categories = const ['Уходовая', 'Декоративная', 'Парфюмерия'];
   String _category = 'Уходовая';
-  double _rating = 3;
+  double _rating = 3.0;
 
   @override
   void initState() {
@@ -41,9 +42,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       _brandCtrl.text = e.brand;
       _volumeCtrl.text = e.volume;
       _expCtrl.text = e.expirationDate;
+      _imageUrlCtrl.text = e.imageUrl ?? '';
       _category = e.category;
       _rating = e.rating;
-      _imageUrlCtrl.text = e.imageUrl ?? '';
     }
   }
 
@@ -67,7 +68,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     if (widget.editing == null) {
       container.addProduct(Product(
-        id: 0, // присвоится автоматически
+        id: 0, // присвоится автоматически в контейнере
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
         category: _category,
@@ -89,27 +90,26 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ));
     }
 
-    // ✅ Вариант B:
-    // если экран открыт через push -> закрываем,
-    // если это вкладка -> просим HomeScreen переключить вкладку и остаёмся.
+    // Если экран открыт через push — закрываем pop().
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
-    } else {
-      widget.onSavedInTab?.call(); // переключить вкладку в HomeScreen
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Продукт сохранён')),
-      );
-      // Дополнительно можно очистить форму:
-      _nameCtrl.clear();
-      _brandCtrl.clear();
-      _volumeCtrl.clear();
-      _expCtrl.clear();
-      _imageUrlCtrl.clear();
-      setState(() {
-        _category = 'Уходовая';
-        _rating = 3;
-      });
+      return;
     }
+
+    // Иначе (как вкладка): дергаем колбэк, чистим форму и уведомляем пользователя.
+    widget.onSavedInTab?.call();
+    _nameCtrl.clear();
+    _brandCtrl.clear();
+    _volumeCtrl.clear();
+    _expCtrl.clear();
+    _imageUrlCtrl.clear();
+    setState(() {
+      _category = 'Уходовая';
+      _rating = 3.0;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Продукт сохранён')),
+    );
   }
 
   @override
@@ -119,6 +119,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Редактирование' : 'Добавить продукт'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+          },
+          tooltip: 'Назад',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -140,26 +149,26 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _category,
+                decoration: const InputDecoration(labelText: 'Категория'),
                 items: _categories
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
                 onChanged: (v) => setState(() => _category = v!),
-                decoration: const InputDecoration(labelText: 'Категория'),
               ),
               TextFormField(
                 controller: _volumeCtrl,
                 decoration:
-                const InputDecoration(labelText: 'Объём (напр., 50 мл)'),
+                const InputDecoration(labelText: 'Объём (например, 50 мл)'),
                 validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Укажите объём' : null,
               ),
               TextFormField(
                 controller: _expCtrl,
-                decoration:
-                const InputDecoration(labelText: 'Срок годности (ММ.ГГГГ)'),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Укажите срок годности'
-                    : null,
+                decoration: const InputDecoration(
+                  labelText: 'Срок годности (ММ.ГГГГ)',
+                ),
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Укажите срок годности' : null,
               ),
               TextFormField(
                 controller: _imageUrlCtrl,

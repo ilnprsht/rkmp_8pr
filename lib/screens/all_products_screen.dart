@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import '../state/products_container.dart';
 import '../widgets/product_tile.dart';
 import '../models/product.dart';
@@ -8,7 +6,7 @@ import 'product_detail_screen.dart';
 import 'product_form_screen.dart';
 
 class AllProductsScreen extends StatefulWidget {
-  final bool embedInsideHome; // уже было у тебя
+  final bool embedInsideHome;
   const AllProductsScreen({super.key, this.embedInsideHome = false});
 
   @override
@@ -26,10 +24,15 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         title: const Text('Все товары'),
         actions: [
           IconButton(
-            tooltip: 'Добавить (Router push)',
-            onPressed: () => context.push('/add'),
+            tooltip: 'Добавить',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProductFormScreen()),
+              );
+            },
             icon: const Icon(Icons.add),
-          ),
+          )
         ],
       ),
       body: products.isEmpty
@@ -37,31 +40,33 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           : ListView.builder(
         itemCount: products.length,
         itemBuilder: (context, i) {
-          final p = products[i];
-          return ProductTile(
-            product: p,
-            onToggleFavorite: () => setState(() => container.toggleFavorite(p.id)),
-            onDelete: () => setState(() => container.deleteProduct(p.id)),
-          ).applyTapHandlers(
-            onTapNavigator: () {
-              // Вертикальная страничная навигация (push)
+          final Product p = products[i];
+          return InkWell(
+            onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProductDetailScreen(product: p)),
+                MaterialPageRoute(
+                  builder: (_) => ProductDetailScreen(product: p),
+                ),
               );
             },
-            onTapRouter: () {
-              // Вертикальная маршрутизированная навигация (push)
-              context.push('/details/${p.id}');
-            },
+            child: ProductTile(
+              product: p,
+              onToggleFavorite: () {
+                setState(() => container.toggleFavorite(p.id));
+              },
+              onDelete: () {
+                setState(() => container.deleteProduct(p.id));
+              },
+            ),
           );
         },
       ),
+      // Если экран открыт не как вкладка — покажем FAB
       floatingActionButton: widget.embedInsideHome
           ? null
           : FloatingActionButton(
         onPressed: () {
-          // Страничная навигация к форме
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ProductFormScreen()),
@@ -69,17 +74,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         },
         child: const Icon(Icons.add),
       ),
-    );
-  }
-}
-
-// небольшой удобный экстеншен, чтобы не трогать ProductTile
-extension on Widget {
-  Widget applyTapHandlers({VoidCallback? onTapNavigator, VoidCallback? onTapRouter}) {
-    return InkWell(
-      onTap: onTapNavigator,           // по умолчанию показываем страничную модель
-      onLongPress: onTapRouter,        // длинное нажатие — маршрутизированную
-      child: this,
     );
   }
 }

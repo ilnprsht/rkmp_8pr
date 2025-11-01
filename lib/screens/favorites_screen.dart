@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import '../state/products_container.dart';
 import '../widgets/product_tile.dart';
+import '../models/product.dart';
+import 'product_detail_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -15,43 +15,38 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     final container = ProductsContainer.of(context);
-    final favorites = container.getFavorites();
+    final products = container.getFavorites();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Избранное'),
-        actions: [
-          IconButton(
-            tooltip: 'Router: перейти к списку (go)',
-            onPressed: () => context.go('/products'),
-            icon: const Icon(Icons.list),
-          ),
-        ],
+        centerTitle: true,
       ),
-      body: favorites.isEmpty
+      body: products.isEmpty
           ? const Center(child: Text('В избранном пусто'))
           : ListView.builder(
-        itemCount: favorites.length,
+        itemCount: products.length,
         itemBuilder: (context, i) {
-          final p = favorites[i];
-          return ProductTile(
-            product: p,
-            onToggleFavorite: () => setState(() => container.toggleFavorite(p.id)),
-            onDelete: () => setState(() => container.deleteProduct(p.id)),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: const Icon(Icons.swap_horiz),
-        label: const Text('Navigator: к списку'),
-        onPressed: () {
-          // Горизонтальная страничная навигация (замена текущего экрана)
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) {
-              context.go('/products');
-              return const SizedBox.shrink();
-            }),
+          final Product p = products[i];
+          return InkWell(
+            onTap: () {
+              // Вертикальный переход в детали избранного товара
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProductDetailScreen(product: p),
+                ),
+              );
+            },
+            child: ProductTile(
+              product: p,
+              onToggleFavorite: () {
+                setState(() => container.toggleFavorite(p.id));
+              },
+              onDelete: () {
+                setState(() => container.deleteProduct(p.id));
+              },
+            ),
           );
         },
       ),
