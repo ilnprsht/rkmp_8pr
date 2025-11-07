@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../state/products_container.dart';
 
-/// Экран добавления/редактирования товара.
-/// Поддерживает два сценария:
-/// 1) Открыт через Navigator.push(...) — стрелка "Назад" делает Navigator.pop(context).
-/// 2) Открыт как вкладка HomeScreen — по сохранению дергается onSavedInTab.
 class ProductFormScreen extends StatefulWidget {
   final Product? editing;
-  final VoidCallback? onSavedInTab; // когда форма открыта как вкладка
 
   const ProductFormScreen({
     super.key,
     this.editing,
-    this.onSavedInTab,
   });
 
   @override
@@ -68,7 +63,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
     if (widget.editing == null) {
       container.addProduct(Product(
-        id: 0, // присвоится автоматически в контейнере
+        id: 0,
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
         category: _category,
@@ -90,26 +85,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ));
     }
 
-    // Если экран открыт через push — закрываем pop().
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-      return;
-    }
-
-    // Иначе (как вкладка): дергаем колбэк, чистим форму и уведомляем пользователя.
-    widget.onSavedInTab?.call();
-    _nameCtrl.clear();
-    _brandCtrl.clear();
-    _volumeCtrl.clear();
-    _expCtrl.clear();
-    _imageUrlCtrl.clear();
-    setState(() {
-      _category = 'Уходовая';
-      _rating = 3.0;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Продукт сохранён')),
-    );
+    // После сохранения — ГОРИЗОНТАЛЬНАЯ маршрутизированная навигация
+    // к списку товаров: очищает историю и открывает список.
+    context.go('/products');
   }
 
   @override
@@ -119,15 +97,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Редактирование' : 'Добавить продукт'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            }
-          },
-          tooltip: 'Назад',
-        ),
+        // Не показываем "Назад", чтобы нельзя было вернуться к списку с этого экрана.
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

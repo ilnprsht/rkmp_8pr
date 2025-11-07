@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../state/products_container.dart';
 import '../widgets/product_tile.dart';
 import '../models/product.dart';
 import 'product_detail_screen.dart';
-import 'product_form_screen.dart';
 
 class AllProductsScreen extends StatefulWidget {
   final bool embedInsideHome;
@@ -17,22 +18,20 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final container = ProductsContainer.of(context);
-    final products = container.products;
+    final List<Product> products = container.products;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Все товары'),
+        // УБРАНЫ кнопки "к избранному" и "заменить на избранное"
         actions: [
+          // "+" — ГОРИЗОНТАЛЬНАЯ маршрутизированная навигация:
+          // заменяем текущий экран на форму добавления, чтобы нельзя было вернуться
           IconButton(
             tooltip: 'Добавить',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProductFormScreen()),
-              );
-            },
             icon: const Icon(Icons.add),
-          )
+            onPressed: () => context.go('/add'),
+          ),
         ],
       ),
       body: products.isEmpty
@@ -40,9 +39,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           : ListView.builder(
         itemCount: products.length,
         itemBuilder: (context, i) {
-          final Product p = products[i];
+          final p = products[i];
           return InkWell(
             onTap: () {
+              // Вертикальная страничная навигация в детали
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -52,26 +52,20 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             },
             child: ProductTile(
               product: p,
-              onToggleFavorite: () {
-                setState(() => container.toggleFavorite(p.id));
-              },
-              onDelete: () {
-                setState(() => container.deleteProduct(p.id));
-              },
+              onToggleFavorite: () =>
+                  setState(() => container.toggleFavorite(p.id)),
+              onDelete: () =>
+                  setState(() => container.deleteProduct(p.id)),
             ),
           );
         },
       ),
-      // Если экран открыт не как вкладка — покажем FAB
+      // По желанию можно оставить FAB — тоже пусть ведёт горизонтально:
       floatingActionButton: widget.embedInsideHome
           ? null
           : FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ProductFormScreen()),
-          );
-        },
+        tooltip: 'Добавить',
+        onPressed: () => context.go('/add'),
         child: const Icon(Icons.add),
       ),
     );

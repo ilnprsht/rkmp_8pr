@@ -37,19 +37,15 @@ final GoRouter appRouter = GoRouter(
           name: 'details',
           builder: (context, state) {
             final id = int.tryParse(state.pathParameters['id'] ?? '');
-            if (id == null) return const Scaffold(body: Center(child: Text('Неверный id')));
+            if (id == null) {
+              return const Scaffold(body: Center(child: Text('Неверный id')));
+            }
             final container = ProductsContainer.of(context);
             final product = container.products.firstWhere(
                   (p) => p.id == id,
               orElse: () => Product(
-                id: id,
-                name: 'Не найдено',
-                brand: '-',
-                category: '-',
-                volume: '-',
-                expirationDate: '-',
-                rating: 0,
-                isFavorite: false,
+                id: id, name: 'Не найдено', brand: '-', category: '-',
+                volume: '-', expirationDate: '-', rating: 0, isFavorite: false,
               ),
             );
             return ProductDetailScreen(product: product);

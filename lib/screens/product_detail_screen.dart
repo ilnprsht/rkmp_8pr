@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../models/product.dart';
 import '../state/products_container.dart';
 import '../widgets/product_card.dart';
@@ -14,7 +13,7 @@ class ProductDetailScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Удалить запись?'),
-        content: Text('Товар «${product.name}» будет удалён из каталога.'),
+        content: Text('Товар «${product.name}» будет удалён.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Удалить')),
@@ -24,12 +23,7 @@ class ProductDetailScreen extends StatelessWidget {
     if (ok == true) {
       final container = ProductsContainer.of(context);
       container.deleteProduct(product.id);
-
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      } else {
-        context.go('/'); // если попнуть нельзя (router) — вернёмся на главную
-      }
+      if (Navigator.canPop(context)) Navigator.pop(context);
     }
   }
 
@@ -39,6 +33,10 @@ class ProductDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Детали товара'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context), // вертикальный возврат
+        ),
       ),
       body: ProductCard(
         product: product,

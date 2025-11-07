@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'state/products_container.dart';
 import 'router/app_router.dart';
 
-void main() {
-  runApp(const AppRoot());
-}
+void main() => runApp(const AppRoot());
 
 class AppRoot extends StatelessWidget {
   const AppRoot({super.key});
@@ -24,4 +22,3 @@ class AppRoot extends StatelessWidget {
     );
   }
 }
-
