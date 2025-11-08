@@ -6,14 +6,36 @@ import '../models/product.dart';
 import 'product_detail_screen.dart';
 import 'product_form_screen.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  void _applyFilter(String? v) {
+    ProductsContainer.scope(context).repository.setCategoryFilter(v);
+    setState(() {});
+  }
+
+  void _deleteProduct(int id) {
+    setState(() {
+      ProductsContainer.scope(context).repository.deleteProduct(id);
+    });
+  }
+
+  void _toggleFavorite(int id) {
+    setState(() {
+      ProductsContainer.scope(context).repository.toggleFavorite(id);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final c = ProductsContainer.of(context);
-    final selected = c.categoryFilter;
-    final List<Product> items = c.filteredFavorites;
+    final repo = ProductsContainer.scope(context).repository;
+    final selected = repo.categoryFilter;
+    final List<Product> items = repo.filteredFavorites;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +48,7 @@ class FavoritesScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: CategoryFilterBar(
               selected: selected,
-              onChanged: (v) => c.setCategoryFilter(v),
+              onChanged: _applyFilter,
             ),
           ),
           const Divider(height: 8),
@@ -48,8 +70,8 @@ class FavoritesScreen extends StatelessWidget {
                   },
                   child: ProductTile(
                     product: p,
-                    onToggleFavorite: () => c.toggleFavorite(p.id),
-                    onDelete: () => c.deleteProduct(p.id),
+                    onToggleFavorite: () => _toggleFavorite(p.id),
+                    onDelete: () => _deleteProduct(p.id),
                     onEdit: () {
                       Navigator.push(
                         context,

@@ -9,7 +9,7 @@ class ProductDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = ProductsContainer.of(context);
+    final repo = ProductsContainer.scope(context).repository;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Информация о товаре')),
@@ -48,7 +48,7 @@ class ProductDetailScreen extends StatelessWidget {
                   icon: Icon(product.isFavorite
                       ? Icons.favorite
                       : Icons.favorite_border),
-                  onPressed: () => c.toggleFavorite(product.id),
+                  onPressed: () => repo.toggleFavorite(product.id),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
@@ -66,7 +66,7 @@ class ProductDetailScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: () {
-                    c.deleteProduct(product.id);
+                    repo.deleteProduct(product.id);
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.delete_outline),

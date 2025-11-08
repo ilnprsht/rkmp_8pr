@@ -7,15 +7,37 @@ import '../models/product.dart';
 import 'product_detail_screen.dart';
 import 'product_form_screen.dart';
 
-class AllProductsScreen extends StatelessWidget {
+class AllProductsScreen extends StatefulWidget {
   final bool embedInsideHome;
   const AllProductsScreen({super.key, this.embedInsideHome = false});
 
   @override
+  State<AllProductsScreen> createState() => _AllProductsScreenState();
+}
+
+class _AllProductsScreenState extends State<AllProductsScreen> {
+  void _applyFilter(String? v) {
+    ProductsContainer.scope(context).repository.setCategoryFilter(v);
+    setState(() {});
+  }
+
+  void _deleteProduct(int id) {
+    setState(() {
+      ProductsContainer.scope(context).repository.deleteProduct(id);
+    });
+  }
+
+  void _toggleFavorite(int id) {
+    setState(() {
+      ProductsContainer.scope(context).repository.toggleFavorite(id);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final c = ProductsContainer.of(context);
-    final selected = c.categoryFilter;
-    final List<Product> items = c.filteredProducts;
+    final repo = ProductsContainer.scope(context).repository;
+    final selected = repo.categoryFilter;
+    final List<Product> items = repo.filteredProducts;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +56,7 @@ class AllProductsScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: CategoryFilterBar(
               selected: selected,
-              onChanged: (v) => c.setCategoryFilter(v),
+              onChanged: _applyFilter,
             ),
           ),
           const Divider(height: 8),
@@ -47,7 +69,6 @@ class AllProductsScreen extends StatelessWidget {
                 final p = items[i];
                 return InkWell(
                   onTap: () {
-                    // Вертикальная страничная навигация в детали
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -57,8 +78,8 @@ class AllProductsScreen extends StatelessWidget {
                   },
                   child: ProductTile(
                     product: p,
-                    onToggleFavorite: () => c.toggleFavorite(p.id),
-                    onDelete: () => c.deleteProduct(p.id),
+                    onToggleFavorite: () => _toggleFavorite(p.id),
+                    onDelete: () => _deleteProduct(p.id),
                     onEdit: () {
                       Navigator.push(
                         context,
@@ -74,7 +95,7 @@ class AllProductsScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: embedInsideHome
+      floatingActionButton: widget.embedInsideHome
           ? null
           : FloatingActionButton(
         tooltip: 'Добавить',

@@ -52,12 +52,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
-    final c = ProductsContainer.of(context);
+    final repo = ProductsContainer.scope(context).repository;
     final imageUrl =
     _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim();
 
     if (widget.editing == null) {
-      c.addProduct(Product(
+      repo.addProduct(Product(
         id: 0,
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
@@ -69,7 +69,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         imageUrl: imageUrl,
       ));
     } else {
-      c.updateProduct(widget.editing!.copyWith(
+      repo.updateProduct(widget.editing!.copyWith(
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
         category: _category,
@@ -80,7 +80,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ));
     }
 
-    // Возвращаемся на список — горизонтальная замена маршрута
     context.go('/products');
   }
 
@@ -90,7 +89,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Редактирование' : 'Добавить продукт'),
-        automaticallyImplyLeading: false, // нельзя вернуться стрелкой
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -127,8 +126,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               TextFormField(
                 controller: _expCtrl,
-                decoration: const InputDecoration(
-                    labelText: 'Срок годности (ММ.ГГГГ)'),
+                decoration:
+                const InputDecoration(labelText: 'Срок годности (ММ.ГГГГ)'),
                 validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Укажите срок' : null,
               ),

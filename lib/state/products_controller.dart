@@ -104,7 +104,6 @@ class ProductsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- CRUD ---
   void addProduct(Product p) {
     final id = _products.isEmpty ? 1 : (_products.last.id + 1);
     _products.add(p.copyWith(id: id));
