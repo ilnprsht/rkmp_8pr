@@ -1,36 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../state/products_container.dart';
-import '../widgets/product_tile.dart';
 import '../models/product.dart';
+import '../widgets/product_tile.dart';
 import 'product_detail_screen.dart';
 
-class AllProductsScreen extends StatefulWidget {
+class AllProductsScreen extends StatelessWidget {
   final bool embedInsideHome;
   const AllProductsScreen({super.key, this.embedInsideHome = false});
 
   @override
-  State<AllProductsScreen> createState() => _AllProductsScreenState();
-}
-
-class _AllProductsScreenState extends State<AllProductsScreen> {
-  @override
   Widget build(BuildContext context) {
-    final container = ProductsContainer.of(context);
-    final List<Product> products = container.products;
+    final c = ProductsContainer.of(context);
+    final List<Product> products = c.products;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Все товары'),
-        // УБРАНЫ кнопки "к избранному" и "заменить на избранное"
         actions: [
-          // "+" — ГОРИЗОНТАЛЬНАЯ маршрутизированная навигация:
-          // заменяем текущий экран на форму добавления, чтобы нельзя было вернуться
+          // пример вертикальной маршрутизированной навигации
           IconButton(
             tooltip: 'Добавить',
             icon: const Icon(Icons.add),
-            onPressed: () => context.go('/add'),
+            onPressed: () => context.go('/add'), // как ты просила для + (горизонтально)
           ),
         ],
       ),
@@ -42,7 +34,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           final p = products[i];
           return InkWell(
             onTap: () {
-              // Вертикальная страничная навигация в детали
+              // страничная вертикальная навигация в детали
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -52,16 +44,13 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             },
             child: ProductTile(
               product: p,
-              onToggleFavorite: () =>
-                  setState(() => container.toggleFavorite(p.id)),
-              onDelete: () =>
-                  setState(() => container.deleteProduct(p.id)),
+              onToggleFavorite: () => c.toggleFavorite(p.id),
+              onDelete: () => c.deleteProduct(p.id),
             ),
           );
         },
       ),
-      // По желанию можно оставить FAB — тоже пусть ведёт горизонтально:
-      floatingActionButton: widget.embedInsideHome
+      floatingActionButton: embedInsideHome
           ? null
           : FloatingActionButton(
         tooltip: 'Добавить',

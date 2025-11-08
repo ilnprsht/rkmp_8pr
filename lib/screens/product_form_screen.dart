@@ -5,11 +5,7 @@ import '../state/products_container.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? editing;
-
-  const ProductFormScreen({
-    super.key,
-    this.editing,
-  });
+  const ProductFormScreen({super.key, this.editing});
 
   @override
   State<ProductFormScreen> createState() => _ProductFormScreenState();
@@ -55,14 +51,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
-
-    final container = ProductsContainer.of(context);
-    final imageUrl = _imageUrlCtrl.text.trim().isEmpty
-        ? null
-        : _imageUrlCtrl.text.trim();
+    final c = ProductsContainer.of(context);
+    final imageUrl = _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim();
 
     if (widget.editing == null) {
-      container.addProduct(Product(
+      c.addProduct(Product(
         id: 0,
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
@@ -74,7 +67,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         imageUrl: imageUrl,
       ));
     } else {
-      container.updateProduct(widget.editing!.copyWith(
+      c.updateProduct(widget.editing!.copyWith(
         name: _nameCtrl.text.trim(),
         brand: _brandCtrl.text.trim(),
         category: _category,
@@ -85,20 +78,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ));
     }
 
-    // После сохранения — ГОРИЗОНТАЛЬНАЯ маршрутизированная навигация
-    // к списку товаров: очищает историю и открывает список.
+    // Возвращаемся к списку (горизонтально, без возврата к форме)
     context.go('/products');
   }
 
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.editing != null;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Редактирование' : 'Добавить продукт'),
-        // Не показываем "Назад", чтобы нельзя было вернуться к списку с этого экрана.
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // назад нельзя (по условию)
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -109,43 +99,32 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               TextFormField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Название'),
-                validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Введите название' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Введите название' : null,
               ),
               TextFormField(
                 controller: _brandCtrl,
                 decoration: const InputDecoration(labelText: 'Бренд'),
-                validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Введите бренд' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Введите бренд' : null,
               ),
               DropdownButtonFormField<String>(
                 value: _category,
                 decoration: const InputDecoration(labelText: 'Категория'),
-                items: _categories
-                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                    .toList(),
+                items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                 onChanged: (v) => setState(() => _category = v!),
               ),
               TextFormField(
                 controller: _volumeCtrl,
-                decoration:
-                const InputDecoration(labelText: 'Объём (например, 50 мл)'),
-                validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Укажите объём' : null,
+                decoration: const InputDecoration(labelText: 'Объём (например, 50 мл)'),
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Укажите объём' : null,
               ),
               TextFormField(
                 controller: _expCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Срок годности (ММ.ГГГГ)',
-                ),
-                validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Укажите срок годности' : null,
+                decoration: const InputDecoration(labelText: 'Срок годности (ММ.ГГГГ)'),
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Укажите срок' : null,
               ),
               TextFormField(
                 controller: _imageUrlCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'URL изображения (опционально)',
-                ),
+                decoration: const InputDecoration(labelText: 'URL изображения (опционально)'),
                 keyboardType: TextInputType.url,
               ),
               const SizedBox(height: 16),
