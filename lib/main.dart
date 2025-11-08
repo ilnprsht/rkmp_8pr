@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
-import 'state/products_container.dart';
-import 'state/products_controller.dart';
+import 'di/di.dart';
 import 'router/app_router.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final controller = ProductsController()..loadInitial();
-  runApp(AppRoot(controller: controller));
+  await initDI();
+  runApp(const AppRootGetIt());
 }
 
-class AppRoot extends StatelessWidget {
-  final ProductsController controller;
-  const AppRoot({super.key, required this.controller});
+class AppRootGetIt extends StatelessWidget {
+  const AppRootGetIt({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ProductsContainer(
-      controller: controller,
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        title: 'Каталог косметики — Inherited',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
-          useMaterial3: true,
-        ),
-        routerConfig: appRouter,
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'Каталог косметики',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
+        useMaterial3: true,
       ),
+      routerConfig: appRouter,
     );
   }
 }
+
 

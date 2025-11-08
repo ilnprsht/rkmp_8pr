@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get_it/get_it.dart';
 import '../models/product.dart';
-import '../state/products_container.dart';
+import '../state/products_controller.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? editing;
@@ -52,7 +53,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
-    final repo = ProductsContainer.scope(context).repository;
+    final repo = GetIt.I<ProductsController>();
     final imageUrl =
     _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim();
 
