@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'products_controller.dart';
 
+
 class ProductsContainer extends InheritedNotifier<ProductsController> {
   const ProductsContainer({
     super.key,
@@ -9,9 +10,10 @@ class ProductsContainer extends InheritedNotifier<ProductsController> {
   }) : super(notifier: controller, child: child);
 
   static ProductsController of(BuildContext context) {
-    final w = context.dependOnInheritedWidgetOfExactType<ProductsContainer>();
-    assert(w != null, 'ProductsContainer not found. Wrap MaterialApp in ProductsContainer.');
-    return w!.notifier!;
+    final scope =
+    context.dependOnInheritedWidgetOfExactType<ProductsContainer>();
+    assert(scope != null,
+    'ProductsContainer not found. Wrap MaterialApp in ProductsContainer.');
+    return scope!.notifier!;
   }
 }
-

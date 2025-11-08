@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'state/products_container.dart';
 import 'state/products_controller.dart';
-import 'router/app_router.dart'; // твой существующий go_router
+import 'router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,5 +29,4 @@ class AppRoot extends StatelessWidget {
     );
   }
 }
-
 

@@ -20,7 +20,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _expCtrl = TextEditingController();
   final _imageUrlCtrl = TextEditingController();
 
-  final _categories = const ['Уходовая', 'Декоративная', 'Парфюмерия'];
+  final _categories = const ['Уходовая', 'Парфюмерия', 'Декоративная'];
   String _category = 'Уходовая';
   double _rating = 3.0;
 
@@ -51,8 +51,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
+
     final c = ProductsContainer.of(context);
-    final imageUrl = _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim();
+    final imageUrl =
+    _imageUrlCtrl.text.trim().isEmpty ? null : _imageUrlCtrl.text.trim();
 
     if (widget.editing == null) {
       c.addProduct(Product(
@@ -78,7 +80,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ));
     }
 
-    // Возвращаемся к списку (горизонтально, без возврата к форме)
+    // Возвращаемся на список — горизонтальная замена маршрута
     context.go('/products');
   }
 
@@ -88,7 +90,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Редактирование' : 'Добавить продукт'),
-        automaticallyImplyLeading: false, // назад нельзя (по условию)
+        automaticallyImplyLeading: false, // нельзя вернуться стрелкой
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -99,32 +101,41 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               TextFormField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Название'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Введите название' : null,
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Введите название' : null,
               ),
               TextFormField(
                 controller: _brandCtrl,
                 decoration: const InputDecoration(labelText: 'Бренд'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Введите бренд' : null,
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Введите бренд' : null,
               ),
               DropdownButtonFormField<String>(
                 value: _category,
                 decoration: const InputDecoration(labelText: 'Категория'),
-                items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                items: _categories
+                    .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                    .toList(),
                 onChanged: (v) => setState(() => _category = v!),
               ),
               TextFormField(
                 controller: _volumeCtrl,
-                decoration: const InputDecoration(labelText: 'Объём (например, 50 мл)'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Укажите объём' : null,
+                decoration:
+                const InputDecoration(labelText: 'Объём (например, 50 мл)'),
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Укажите объём' : null,
               ),
               TextFormField(
                 controller: _expCtrl,
-                decoration: const InputDecoration(labelText: 'Срок годности (ММ.ГГГГ)'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Укажите срок' : null,
+                decoration: const InputDecoration(
+                    labelText: 'Срок годности (ММ.ГГГГ)'),
+                validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Укажите срок' : null,
               ),
               TextFormField(
                 controller: _imageUrlCtrl,
-                decoration: const InputDecoration(labelText: 'URL изображения (опционально)'),
+                decoration: const InputDecoration(
+                    labelText: 'URL изображения (опционально)'),
                 keyboardType: TextInputType.url,
               ),
               const SizedBox(height: 16),

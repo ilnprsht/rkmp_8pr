@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'all_products_screen.dart';
-import 'favorites_screen.dart';
-import 'product_form_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,59 +7,30 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Каталог косметической продукции'),
-        centerTitle: true,
-      ),
-      body: ListView(
+      appBar: AppBar(title: const Text('Главная')),
+      body: Padding(
         padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            'Навигация',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-
-          // ВЕРТИКАЛЬНО: в список товаров
-          FilledButton.icon(
-            icon: const Icon(Icons.list),
-            label: const Text('Все товары'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AllProductsScreen(embedInsideHome: false),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-
-          // ВЕРТИКАЛЬНО: в избранное
-          FilledButton.icon(
-            icon: const Icon(Icons.favorite),
-            label: const Text('Избранное'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-
-          // ВЕРТИКАЛЬНО: форма добавления
-          FilledButton.icon(
-            icon: const Icon(Icons.add),
-            label: const Text('Добавить продукт'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProductFormScreen()),
-              );
-            },
-          ),
-        ],
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.list),
+              title: const Text('Все товары'),
+              onTap: () => context.push('/products'),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.favorite),
+              title: const Text('Избранное'),
+              onTap: () => context.push('/favorites'),
+            ),
+            const Spacer(),
+            FilledButton.icon(
+              onPressed: () => context.go('/add'), // горизонтально (без шага назад)
+              icon: const Icon(Icons.add),
+              label: const Text('Добавить продукт'),
+            ),
+          ],
+        ),
       ),
     );
   }
