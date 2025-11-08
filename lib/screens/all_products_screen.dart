@@ -46,7 +46,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           IconButton(
             tooltip: 'Добавить',
             icon: const Icon(Icons.add),
-            onPressed: () => context.go('/add'), // горизонтально на форму
+            onPressed: () => context.go('/add'),
           ),
         ],
       ),
